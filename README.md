@@ -1,7 +1,7 @@
 HACK4DK - Public Art
 ====================
 
-> Visualisation of public art in Denmark, as bought by the Kunst Styrelsen (the Art Agency)
+> Visualisation of public art in Denmark, bought by Kunst Styrelsen (the Art Agency)
 
 Notes
 -----
@@ -18,7 +18,7 @@ Ideas
 - Distribution of features over time
   - Male vs Female Artists
   - Age of Artist at the time the piece is added to the collection
-  - Geolocation (Catival vs. province)
+  - Geolocation (capital vs. province)
 
 License
 -------
