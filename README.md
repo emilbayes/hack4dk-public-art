@@ -3,6 +3,20 @@ HACK4DK - Public Art
 
 > Visualisation of public art in Denmark, bought by Kunst Styrelsen (the Art Agency)
 
+Development
+-----------
+
+Everything related to project life-cycle is managed by npm scripts. Javascript
+is bundled using Browserify and CSS is bundled using CSSNext. HTML and static
+assets are copied using `cp`. Note that the scripts will only work in a `sh`
+(and might even require `bash`) shell due to `&`, `&&` and `wait`.
+
+```bash
+npm run watch # Watch css, js and serve assets on port 8000
+npm run clean # Remove `dist` and bundle files
+npm run bundle # Build everything to `dist`
+```
+
 Notes
 -----
 
