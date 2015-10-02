@@ -6,15 +6,14 @@ HACK4DK - Public Art
 Development
 -----------
 
-Everything related to project life-cycle is managed by npm scripts. Javascript
-is bundled using Browserify and CSS is bundled using CSSNext. HTML and static
-assets are copied using `cp`. Note that the scripts will only work in a `sh`
+Everything related to project life-cycle is managed by [`Makefile`](Makefile). Javascript is bundled using Browserify and CSS is bundled using CSSNext. HTML and static assets are copied using `cp`. Note that the scripts will only work in a `sh`
 (and might even require `bash`) shell due to `&`, `&&` and `wait`.
 
 ```bash
 npm run watch # Watch css, js and serve assets on port 8000
 npm run clean # Remove `dist` and bundle files
 npm run bundle # Build everything to `dist`
+npm test # Lint code using Standard
 ```
 
 Notes

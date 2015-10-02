@@ -4,16 +4,10 @@
   "description": "Visualisation of public art in Denmark, bought by Kunst Styrelsen (the Art Agency)",
   "main": "src/index.js",
   "scripts": {
-    "test": "standard",
-    "clean": "rm -rf dist src/bundle.js src/bundle.css",
-    "bundle": "npm run clean && mkdir -p dist && (npm run bundle-js & npm run bundle-css & npm run bundle-assets & wait)",
-    "bundle-css": "cssnext src/index.css dist/bundle.css",
-    "bundle-js": "browserify src/index.js -o dist/bundle.js",
-    "bundle-assets": "cp -r src/*.html dist",
-    "watch": "npm run watch-css & npm run watch-js & npm run serve & wait",
-    "watch-css": "cssnext --watch src/index.css src/bundle.css",
-    "watch-js": "watchify src/index.js -o src/bundle.js",
-    "serve": "ecstatic src"
+    "test": "make test",
+    "clean": "make clean",
+    "bundle": "make bundle",
+    "watch": "make watch"
   },
   "repository": {
     "type": "git",
