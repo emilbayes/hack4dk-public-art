@@ -22,7 +22,8 @@ dist/index.html: src/index.html dist/
 watch:
 	$(CSSNEXT) --watch src/index.css src/bundle.css & \
 	$(WATCHIFY) src/index.js -o src/bundle.js & \
-	$(ECSTATIC) src & \
+	watch -n1 make dist/index.html & \
+	$(ECSTATIC) dist & \
 	wait
 
 test: lint
