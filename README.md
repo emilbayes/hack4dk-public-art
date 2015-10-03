@@ -1,5 +1,5 @@
-HACK4DK - Public Art
-====================
+HACK4DK - Public Art [![Build Status][1]][2]
+============================================
 
 > Visualisation of public art in Denmark, bought by Kunst Styrelsen (the Art Agency)
 
@@ -37,3 +37,6 @@ License
 -------
 
 [ISC](LICENSE)
+
+  [1]: https://travis-ci.org/emilbayes/hack4dk-public-art.svg
+  [2]: https://travis-ci.org/emilbayes/hack4dk-public-art
