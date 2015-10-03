@@ -8,3 +8,5 @@ A tiny bit of preprocssing was done before adding the data:
   some summary rows at the end of the file were removed
 * `indboeb_pol.csv` was renamed to `purchases.csv` and transcoded from `utf-16`
   to `utf-8` using `iconv -f utf-16 -t utf-8`
+
+Everything else is reproducible using `process.jl` using Julia `0.3.10`

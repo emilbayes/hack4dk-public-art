@@ -1,3 +1,4 @@
 node_modules/**
 dist/**
 src/bundle.*
+data/refined-data/artists-purchases.csv

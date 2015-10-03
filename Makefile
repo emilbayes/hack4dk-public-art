@@ -5,7 +5,7 @@ CSSNEXT := $(NODE_MODULES_BIN)/cssnext
 ECSTATIC := $(NODE_MODULES_BIN)/ecstatic
 STANDARD := $(NODE_MODULES_BIN)/standard
 
-bundle: dist/ dist/bundle.js dist/bundle.css dist/index.html
+bundle: data dist/ dist/bundle.js dist/bundle.css dist/index.html
 
 dist/:
 	mkdir -p dist
@@ -18,6 +18,17 @@ dist/bundle.css: src/index.css src/*.css dist/
 
 dist/index.html: src/index.html dist/
 	cp $< $@
+
+data: dist/ dist/committee-members.csv dist/artists-purchases.csv
+
+dist/committee-members.csv: data/refined-data/committee-members.csv
+	cp $< $@
+
+dist/artists-purchases.csv: data/refined-data/artists-purchases.csv
+	cp $< $@
+
+data/refined-data/artists-purchases.csv: data/raw/artists.csv data/raw/purchases.csv
+	julia data/process.jl
 
 watch:
 	$(CSSNEXT) --watch src/index.css src/bundle.css & \
