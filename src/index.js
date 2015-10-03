@@ -1,4 +1,4 @@
-var d3 = require('d3')
+// var d3 = require('d3')
 var c = require('d3-convention')({
   parent: window.document.querySelector('main')
 })
