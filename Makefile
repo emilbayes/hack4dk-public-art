@@ -50,12 +50,13 @@ deploy: dist/ dist/.git bundle commit-gh-pages
 dist/.git: dist/
 	cd dist && \
 	git init && \
-	git remote add origin git@github.com:$(TRAVIS_REPO_SLUG).git && \
+	git remote add origin "https://$(GH_TOKEN)@github.com/$(TRAVIS_REPO_SLUG).git" && \
 	git pull origin gh-pages
 
-commit-gh-pages: bundle
+commit-gh-pages: dist/.git bundle
 	cd dist && \
 	git add . && \
 	git config user.name "Travis CI" && \
 	git config user.email "no-reply@tixz.dk" && \
-	git commit -m "Deploy $(TRAVIS_TAG)"
+	git commit -m "Deploy $(TRAVIS_TAG)" && \
+	git push --quiet origin master:gh-pages
