@@ -44,5 +44,19 @@ lint: src/*.js
 clean:
 	rm -rf $(BUNDLE_FOLDER)/ src/bundle.css src/bundle.js
 
-gh-pages:
-	
+deploy: dist/ dist/.git bundle commit-gh-pages
+
+TRAVIS_REPO_SLUG ?= emilbayes/hack4dk-public-art
+
+dist/.git: dist/
+	cd dist && \
+	git init && \
+	git remote add origin git@github.com:$(TRAVIS_REPO_SLUG).git && \
+	git pull origin gh-pages
+
+commit-gh-pages: bundle
+	cd dist && \
+	git add . && \
+	git config user.name "Travis CI" && \
+	git config user.email "no-reply@tixz.dk" && \
+	git commit -m "Deploy $(TRAVIS_TAG)"
