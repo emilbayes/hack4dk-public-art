@@ -35,8 +35,8 @@ dist/index.html: src/index.html dist/
 watch:
 	$(CSSNEXT) --watch src/index.css src/bundle.css & \
 	$(WATCHIFY) src/index.js -o src/bundle.js & \
-	watch -n1 make dist/index.html & \
 	$(ECSTATIC) dist & \
+	while true; do sleep 0.5; make dist/index.html > /dev/null; done; \
 	wait
 
 lint: src/*.js
