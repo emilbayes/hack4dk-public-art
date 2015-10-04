@@ -43,8 +43,7 @@ lint: src/*.js
 	$(STANDARD) $^
 
 clean:
-	rm -rf dist/
-	rm data/refined-data/artists-purchases.csv
+	rm -rf dist/ data/refined-data/artists-purchases.csv
 
 ##
 # Make data files
@@ -62,6 +61,7 @@ data/refined-data/artists-purchases.csv: data/raw/artists.csv data/raw/purchases
 ##
 # Deploy targets
 ##
+.SILENT: dist/.git commit-gh-pages
 dist/.git: dist/
 	cd dist && \
 	git init && \
