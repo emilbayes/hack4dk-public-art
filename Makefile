@@ -9,6 +9,7 @@ ECSTATIC := $(NODE_MODULES_BIN)/ecstatic
 STANDARD := $(NODE_MODULES_BIN)/standard
 
 .PHONY: bundle data test deploy lint watch clean
+.FORCE:
 bundle: data dist/ dist/bundle.js dist/bundle.css dist/index.html
 data: dist/ dist/committee-members.csv dist/artists-purchases.csv
 test: lint
@@ -20,13 +21,13 @@ deploy: dist/ dist/.git bundle commit-gh-pages
 dist/:
 	mkdir -p dist
 
-dist/bundle.js: src/index.js src/*.js dist/
+dist/bundle.js: src/index.js src/*.js dist/ .FORCE
 	$(BROWSERIFY) $< -o $@
 
-dist/bundle.css: src/index.css src/*.css dist/
+dist/bundle.css: src/index.css src/*.css dist/ .FORCE
 	$(CSSNEXT) $< $@
 
-dist/index.html: src/index.html dist/
+dist/index.html: src/index.html dist/ .FORCE
 	cp $< $@
 
 ##
@@ -48,10 +49,10 @@ clean:
 ##
 # Make data files
 ##
-dist/committee-members.csv: data/refined-data/committee-members.csv
+dist/committee-members.csv: data/refined-data/committee-members.csv .FORCE
 	cp $< $@
 
-dist/artists-purchases.csv: data/refined-data/artists-purchases.csv
+dist/artists-purchases.csv: data/refined-data/artists-purchases.csv .FORCE
 	cp $< $@
 
 data/refined-data/artists-purchases.csv: data/raw/artists.csv data/raw/purchases.csv
