@@ -9682,6 +9682,14 @@ var genderDist = convention({
   svg: window.document.getElementById('gender-distribution')
 })
 
+var comMemGender = convention({
+  svg: window.document.getElementById('committee-member-gender')
+})
+
+var artLocation = convention({
+  svg: window.document.getElementById('art-location')
+})
+
 d3.csv('artists-purchases.csv')
 .row(function (d) {
   return {
