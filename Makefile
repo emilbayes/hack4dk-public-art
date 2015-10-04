@@ -33,8 +33,8 @@ dist/index.html: src/index.html dist/
 # Aux helpers
 ##
 watch:
-	$(CSSNEXT) --watch src/index.css src/bundle.css & \
-	$(WATCHIFY) src/index.js -o src/bundle.js & \
+	$(CSSNEXT) --watch src/index.css dist/bundle.css & \
+	$(WATCHIFY) src/index.js -o dist/bundle.js & \
 	$(ECSTATIC) dist & \
 	while true; do sleep 0.5; make dist/index.html > /dev/null; done; \
 	wait
@@ -44,6 +44,7 @@ lint: src/*.js
 
 clean:
 	rm -rf dist/
+	rm data/refined-data/artists-purchases.csv
 
 ##
 # Make data files
