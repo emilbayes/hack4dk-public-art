@@ -1,4 +1,3 @@
-# Change dir so Julia will understand the paths
 cd(dirname(@__FILE__))
 
 using DataFrames
@@ -43,5 +42,5 @@ purchases[:year] = map(fixyear, eachrow(purchases))
 # Ignore remaining NA for now
 complete_cases!(purchases)
 
-joined = join(purchases, artists, on = :display_name, kind = :semi)
+joined = join(purchases, artists, on = :display_name, kind = :inner)
 writetable("refined-data/artists-purchases.csv", joined, nastring = "")
