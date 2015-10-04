@@ -53,7 +53,8 @@ dist/committee-members.csv: data/refined-data/committee-members.csv .FORCE
 	cp $< $@
 
 dist/artists-purchases.csv: data/refined-data/artists-purchases.csv .FORCE
-	cp $< $@
+	# Quick fix. Julia escapes " as \", where the standard is ""
+	cat $< | sed s'/\\"/""/g' > $@
 
 data/refined-data/artists-purchases.csv: data/raw/artists.csv data/raw/purchases.csv
 	julia data/process.jl
