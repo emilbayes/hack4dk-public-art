@@ -1,12 +1,22 @@
-// var d3 = require('d3')
-var c = require('d3-convention')({
-  parent: window.document.querySelector('main')
+var d3 = require('d3')
+var convention = require('d3-convention')
+
+var genderDistributionGraphic = require('./graphics/gender-distribution')
+
+var genderDist = convention({
+  svg: window.document.getElementById('gender-distribution')
 })
 
-// Hello World
-c.svg.append('rect').style('fill', 'red').attr({
-  x: c.x(0),
-  y: c.x(0),
-  width: c.x(1),
-  height: c.x(1)
+d3.csv('artists-purchases.csv')
+.row(function (d) {
+  return {
+    id: d.id,
+    gender: d.gender,
+    year: +d.year
+  }
+})
+.get(function (err, data) {
+  if (err) return console.error(err)
+
+  genderDistributionGraphic(genderDist, data)
 })
