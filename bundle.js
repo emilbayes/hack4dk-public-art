@@ -9546,17 +9546,154 @@ module.exports = function (opts) {
   this.d3 = d3;
 }();
 },{}],3:[function(require,module,exports){
+var maybe = require('maybe-args');
+
+var slice = Array.prototype.slice;
+
+var compose = maybe(function (){
+    var args = slice.call(arguments);
+
+    if(args.length === 1) return args[0];
+    if(args.length === 2) return _compose(args[0], args[1]);
+
+    return _compose(args.shift(), compose.apply(this, args));
+})
+
+compose.ltr = function() {
+  return compose.apply(compose, slice.call(arguments).reverse());
+};
+
+function _compose(fn2, fn1){
+    return function(arg){
+        return fn2(fn1(arg));
+    };
+}
+
+module.exports = compose;
+
+},{"maybe-args":4}],4:[function(require,module,exports){
+var slice = Array.prototype.slice;
+
+module.exports = function maybe (fn){
+    return function(){
+        var args = slice.call(arguments),
+            valid,
+            result;
+        
+        valid = args.reduce(function(curr, prev){
+            return curr && prev != null;
+        }, true);
+
+        if(!valid) return void 0;
+        
+        result = fn.apply(null, args);
+        
+        return typeof result === 'function' ? maybe(result) : result;
+    }
+}
+},{}],5:[function(require,module,exports){
+module.exports = function (prop, dflt) {
+  return function (d) {
+    return d[prop] || dflt
+  }
+}
+
+},{}],6:[function(require,module,exports){
+'use strict'
+
+/**
+ * Center the layers around a central axis, growing to either side.
+ * Currently only works for two layers
+ */
+module.exports = function (data) {
+  var layers = data.length
+  var points = data[0].length
+  var max = 0
+  var i, j, s
+
+  for (j = 0; j < points; ++j) {
+    for (i = 0, s = 0; i < layers; i++) s += data[i][j][1]
+    if (s > max) max = s
+  }
+
+  var y0 = []
+  for (j = 0; j < points; ++j) {
+    y0[j] = max / 2 - data[0][j][1]
+  }
+
+  return y0
+}
+
+},{}],7:[function(require,module,exports){
 var d3 = require('d3')
-var c = require('d3-convention')({
-  parent: window.document.querySelector('main')
+var o = require('fn-compose').ltr
+var ƒ = require('../d3-helpers/access-prop')
+
+var offsetCenter = require('../d3-helpers/stack-offset-center')
+
+module.exports = function (conv, data) {
+  var yearScale = d3.scale.linear()
+      .domain(d3.extent(data, ƒ('year')))
+			.range(conv.x.range())
+
+  var countScale = d3.scale.linear()
+			.domain([0, 600])
+			.range(conv.y.range())
+
+  var area = d3.svg.area()
+    .x(o(ƒ('x'), yearScale))
+		.y0(o(ƒ('y0', 0), countScale))
+		.y1(function (d) { return countScale(d.y0 + d.y) })
+
+  var bin = d3.layout.histogram()
+      .bins(d3.range.apply(d3, yearScale.domain()))
+      .value(ƒ('year'))
+
+  var stack = d3.layout.stack()
+      .order('reverse')
+      .offset(offsetCenter)
+      .values(ƒ('values'))
+      .x(ƒ('x'))
+      .y(ƒ('y', 0))
+
+  var genders = d3.nest()
+      .key(ƒ('gender'))
+      .rollup(bin)
+      .entries(data
+					.filter(ƒ('year'))
+					.filter(function (d) { return d.gender !== 'grp' })
+			)
+
+  conv.svg.selectAll('path')
+			.data(stack(genders))
+		.enter().append('path')
+			.attr('class', ƒ('key'))
+			.attr('d', o(ƒ('values'), area))
+			.style('fill', function (d) { return d.key === 'm' ? '#4E96A3' : '#FE664A' })
+}
+
+},{"../d3-helpers/access-prop":5,"../d3-helpers/stack-offset-center":6,"d3":2,"fn-compose":3}],8:[function(require,module,exports){
+var d3 = require('d3')
+var convention = require('d3-convention')
+
+var genderDistributionGraphic = require('./graphics/gender-distribution')
+
+var genderDist = convention({
+  svg: window.document.getElementById('gender-distribution')
 })
 
-// Hello World
-c.svg.append('rect').style('fill', 'red').attr({
-  x: c.x(0),
-  y: c.x(0),
-  width: c.x(1),
-  height: c.x(1)
+d3.csv('artists-purchases.csv')
+.row(function (d) {
+  return {
+    id: d.id,
+    gender: d.gender,
+    year: +d.year
+  }
+})
+.get(function (err, data) {
+  if (err) return console.error(err)
+
+  genderDistributionGraphic(genderDist, data)
 })
 
-},{"d3":2,"d3-convention":1}]},{},[3]);
+},{"./graphics/gender-distribution":7,"d3":2,"d3-convention":1}]},{},[8]);
