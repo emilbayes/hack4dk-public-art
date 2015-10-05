@@ -50,7 +50,7 @@ clean:
 # Make data files
 ##
 dist/committee-members.csv: data/refined-data/committee-members.csv .FORCE
-	cp $< $@
+	cat $< | egrep -v '^#.*' > $@
 
 dist/artists-purchases.csv: data/refined-data/artists-purchases.csv .FORCE
 	# Quick fix. Julia escapes " as \", where the standard is ""
