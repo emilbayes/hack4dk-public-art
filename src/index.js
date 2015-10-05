@@ -5,7 +5,9 @@ var parallel = require('run-parallel')
 var genderDistributionGraphic = require('./graphics/gender-distribution')
 
 var genderDist = convention({
-  svg: window.document.getElementById('gender-distribution')
+  svg: window.document.getElementById('gender-distribution'),
+  width: 1260,
+  height: 720
 })
 
 parallel([
