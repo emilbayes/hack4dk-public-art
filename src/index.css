@@ -1,1 +1,14 @@
-@import 'normalize.css'
+@import 'normalize.css';
+@import url(https://fonts.googleapis.com/css?family=Lora);
+
+main {
+  width: 1280px;
+  margin: auto;
+}
+
+p, h1 {
+  width: 40rem;
+  margin: 1em auto;
+  display: block;
+  font-family: 'Lora', serif;
+}
