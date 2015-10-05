@@ -12,3 +12,33 @@ p, h1 {
   display: block;
   font-family: 'Lora', serif;
 }
+
+path.m {
+  fill: #4E96A3;
+}
+
+path.k {
+  fill: #FE664A;
+}
+
+line.new-committee {
+  stroke: #fff;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font: 10px sans-serif;
+  fill: #555;
+}
+
+.diff-line {
+  fill: none;
+  stroke: rgba(64,64,64,.6);
+  stroke-width: 1.5px;
+}

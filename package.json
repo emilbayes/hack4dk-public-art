@@ -40,6 +40,7 @@
     "d3": "^3.5.6",
     "d3-convention": "^2.0.0",
     "normalize.css": "^3.0.3",
+    "range-inclusive": "^1.0.0",
     "run-parallel": "^1.1.4"
   }
 }

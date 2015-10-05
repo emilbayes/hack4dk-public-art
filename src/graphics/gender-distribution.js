@@ -1,4 +1,5 @@
 var d3 = require('d3')
+var rangeInclusive = require('range-inclusive')
 var o = require('fn-compose').ltr
 var ƒ = require('../d3-helpers/access-prop')
 
@@ -14,21 +15,30 @@ module.exports = function (conv, data) {
 			.range(conv.y.range())
 
   var area = d3.svg.area()
+    .interpolate('monotone')
     .x(o(ƒ('x'), yearScale))
 		.y0(o(ƒ('y0', 0), countScale))
 		.y1(function (d) { return countScale(d.y0 + d.y) })
 
+  var line = d3.svg.line()
+    .interpolate('monotone')
+    .x(o(ƒ('x'), yearScale))
+		.y(o(ƒ('y0', 0), countScale))
+
+  // Bin art pieces by year
   var bin = d3.layout.histogram()
-      .bins(d3.range.apply(d3, yearScale.domain()))
+      .bins(rangeInclusive.apply(0, yearScale.domain()))
       .value(ƒ('year'))
 
+  // Stack values, creating a common baseline
   var stack = d3.layout.stack()
       .order('reverse')
-      .offset(offsetCenter)
+      .offset(offsetCenter) // Offset center will create a central baseline
       .values(ƒ('values'))
       .x(ƒ('x'))
       .y(ƒ('y', 0))
 
+  // Roll up genders into bins, only considering datums with year and gender ['m', 'k']
   var genders = d3.nest()
       .key(ƒ('gender'))
       .rollup(bin)
@@ -45,10 +55,57 @@ module.exports = function (conv, data) {
       })
       .entries(data.committeeMembers)
 
+  // Draw gender areas
   conv.svg.selectAll('path')
-			.data(stack(genders))
+			.data(stack(genders)) // Mutates
 		.enter().append('path')
 			.attr('class', ƒ('key'))
 			.attr('d', o(ƒ('values'), area))
-			.style('fill', function (d) { return d.key === 'm' ? '#4E96A3' : '#FE664A' })
+
+  var baseline = o(ƒ('y0'), countScale)(genders[0].values[0])
+
+  // Draw diff line
+  conv.svg.append('path')
+			.datum(d3.zip.apply(d3, genders.map(ƒ('values'))).map(function (d) {
+        return {y0: (d[0].y - d[1].y) + d[0].y0, x: d[0].x}
+      }))
+      .attr({
+        class: 'diff-line'
+      })
+      .transition()
+      .duration(400)
+      .attr('d', line)
+
+  // Draw committee lines
+  conv.svg.selectAll('line')
+      .data(committees)
+    .enter().append('line')
+      .attr({
+        class: 'new-committee',
+        x1: o(ƒ('values'), yearScale),
+        y1: countScale(600),
+        x2: o(ƒ('values'), yearScale),
+        y2: countScale(0)
+      })
+
+  // Axis
+  var yearAxis = d3.svg.axis()
+      .scale(yearScale)
+      .tickSize(0)
+      .tickValues([1920, 1930, 1940, 1950, 1960].concat(committees.map(ƒ('values'))))
+      .tickFormat(d3.format('d'))
+
+  conv.svg.append('g')
+      .classed('axis x', true)
+      .attr('transform', 'translate(0,' + baseline + ')')
+      .call(yearAxis)
+  // Rotate x-axis labels
+    .selectAll('text')
+      .attr({
+        y: 0,
+        x: 9,
+        dy: '.35em',
+        transform: 'rotate(50)'
+      })
+      .style('text-anchor', 'start')
 }
