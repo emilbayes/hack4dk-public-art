@@ -1,9 +1,3 @@
-# Notes on entry:
-# * Data is manually entered from Wikipedia on 3 Oct. 2015 (https://da.wikipedia.org/wiki/Statens_Kunstfonds_Udvalg_for_Kunst_i_det_Offentlige_Rum)
-# * "Indtil"  is interperted as the 1st of the month, since intervals are assumed
-#   to be half-open, [start, end)
-# * Mogens Møller is chairman until Oct 2000, member until aug 2001, then
-#   succeeded by Niels Winkel. This can be read in "Årsbereningen 2001" (http://www.kunst.dk/fileadmin/_kunst2011/user_upload/Dokumenter/Kunstfonden/AArsberetninger/AArsberetning_2001.pdf)
 "name","gender","committee_id","position","start_date","end_date"
 "Erik Fischer","m","1","chariman","1965-01-01","1967-01-01"
 "Georg Jacobsen","m","1","member","1965-01-01","1967-01-01"

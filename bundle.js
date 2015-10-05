@@ -1,4 +1,97 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],2:[function(require,module,exports){
 'use strict'
 
 var d3 = require('d3')
@@ -40,7 +133,7 @@ module.exports = function (opts) {
   return opts
 }
 
-},{"d3":2}],2:[function(require,module,exports){
+},{"d3":3}],3:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.6"
@@ -9545,7 +9638,7 @@ module.exports = function (opts) {
   if (typeof define === "function" && define.amd) define(d3); else if (typeof module === "object" && module.exports) module.exports = d3;
   this.d3 = d3;
 }();
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var maybe = require('maybe-args');
 
 var slice = Array.prototype.slice;
@@ -9571,7 +9664,7 @@ function _compose(fn2, fn1){
 
 module.exports = compose;
 
-},{"maybe-args":4}],4:[function(require,module,exports){
+},{"maybe-args":5}],5:[function(require,module,exports){
 var slice = Array.prototype.slice;
 
 module.exports = function maybe (fn){
@@ -9591,14 +9684,78 @@ module.exports = function maybe (fn){
         return typeof result === 'function' ? maybe(result) : result;
     }
 }
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
+module.exports = function rangeInclusive (start, stop, step) {
+  if (stop == null) {
+    stop = start
+    start = 1
+  }
+  if (step == null) step = 1
+
+  var set = []
+  for (; (stop - start) * step >= 0; start += step) set.push(start)
+
+  return set
+}
+
+},{}],7:[function(require,module,exports){
+(function (process){
+module.exports = function (tasks, cb) {
+  var results, pending, keys
+  var isSync = true
+
+  if (Array.isArray(tasks)) {
+    results = []
+    pending = tasks.length
+  } else {
+    keys = Object.keys(tasks)
+    results = {}
+    pending = keys.length
+  }
+
+  function done (err) {
+    function end () {
+      if (cb) cb(err, results)
+      cb = null
+    }
+    if (isSync) process.nextTick(end)
+    else end()
+  }
+
+  function each (i, err, result) {
+    results[i] = result
+    if (--pending === 0 || err) {
+      done(err)
+    }
+  }
+
+  if (!pending) {
+    // empty
+    done(null)
+  } else if (keys) {
+    // object
+    keys.forEach(function (key) {
+      tasks[key](each.bind(undefined, key))
+    })
+  } else {
+    // array
+    tasks.forEach(function (task, i) {
+      task(each.bind(undefined, i))
+    })
+  }
+
+  isSync = false
+}
+
+}).call(this,require('_process'))
+},{"_process":1}],8:[function(require,module,exports){
 module.exports = function (prop, dflt) {
   return function (d) {
     return d[prop] || dflt
   }
 }
 
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict'
 
 /**
@@ -9624,8 +9781,9 @@ module.exports = function (data) {
   return y0
 }
 
-},{}],7:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var d3 = require('d3')
+var rangeInclusive = require('range-inclusive')
 var o = require('fn-compose').ltr
 var ƒ = require('../d3-helpers/access-prop')
 
@@ -9633,7 +9791,7 @@ var offsetCenter = require('../d3-helpers/stack-offset-center')
 
 module.exports = function (conv, data) {
   var yearScale = d3.scale.linear()
-      .domain(d3.extent(data, ƒ('year')))
+      .domain(d3.extent(data.artistsPurchases, ƒ('year')))
 			.range(conv.x.range())
 
   var countScale = d3.scale.linear()
@@ -9641,67 +9799,125 @@ module.exports = function (conv, data) {
 			.range(conv.y.range())
 
   var area = d3.svg.area()
+    .interpolate('monotone')
     .x(o(ƒ('x'), yearScale))
 		.y0(o(ƒ('y0', 0), countScale))
 		.y1(function (d) { return countScale(d.y0 + d.y) })
 
+  var line = d3.svg.line()
+    .interpolate('monotone')
+    .x(o(ƒ('x'), yearScale))
+		.y(o(ƒ('y0', 0), countScale))
+
+  // Bin art pieces by year
   var bin = d3.layout.histogram()
-      .bins(d3.range.apply(d3, yearScale.domain()))
+      .bins(rangeInclusive.apply(0, yearScale.domain()))
       .value(ƒ('year'))
 
+  // Stack values, creating a common baseline
   var stack = d3.layout.stack()
       .order('reverse')
-      .offset(offsetCenter)
+      .offset(offsetCenter) // Offset center will create a central baseline
       .values(ƒ('values'))
       .x(ƒ('x'))
       .y(ƒ('y', 0))
 
+  // Roll up genders into bins, only considering datums with year and gender ['m', 'k']
   var genders = d3.nest()
       .key(ƒ('gender'))
       .rollup(bin)
-      .entries(data
+      .entries(data.artistsPurchases
 					.filter(ƒ('year'))
 					.filter(function (d) { return d.gender !== 'grp' })
 			)
 
+  // Roll up committees into the start of their servance
+  var committees = d3.nest()
+      .key(ƒ('committee_id'))
+      .rollup(function (values) {
+        return d3.min(values.map(ƒ('start_date')).map(function (d) { return d.getFullYear() }))
+      })
+      .entries(data.committeeMembers)
+
+  // Draw gender areas
   conv.svg.selectAll('path')
-			.data(stack(genders))
+			.data(stack(genders)) // Mutates
 		.enter().append('path')
 			.attr('class', ƒ('key'))
 			.attr('d', o(ƒ('values'), area))
-			.style('fill', function (d) { return d.key === 'm' ? '#4E96A3' : '#FE664A' })
+
+  var baseline = o(ƒ('y0'), countScale)(genders[0].values[0])
+
+  // Draw diff line
+  conv.svg.append('path')
+			.datum(d3.zip.apply(d3, genders.map(ƒ('values'))).map(function (d) {
+        return {y0: (d[0].y - d[1].y) + d[0].y0, x: d[0].x}
+      }))
+      .attr({
+        class: 'diff-line'
+      })
+      .transition()
+      .duration(400)
+      .attr('d', line)
+
+  // Draw committee lines
+  conv.svg.selectAll('line')
+      .data(committees)
+    .enter().append('line')
+      .attr({
+        class: 'new-committee',
+        x1: o(ƒ('values'), yearScale),
+        y1: countScale(600),
+        x2: o(ƒ('values'), yearScale),
+        y2: countScale(0)
+      })
+
+  // Axis
+  var yearAxis = d3.svg.axis()
+      .scale(yearScale)
+      .tickSize(0)
+      .tickValues([1920, 1930, 1940, 1950, 1960].concat(committees.map(ƒ('values'))))
+      .tickFormat(d3.format('d'))
+
+  conv.svg.append('g')
+      .classed('axis x', true)
+      .attr('transform', 'translate(0,' + baseline + ')')
+      .call(yearAxis)
+  // Rotate x-axis labels
+    .selectAll('text')
+      .attr({
+        y: 0,
+        x: 9,
+        dy: '.35em',
+        transform: 'rotate(50)'
+      })
+      .style('text-anchor', 'start')
 }
 
-},{"../d3-helpers/access-prop":5,"../d3-helpers/stack-offset-center":6,"d3":2,"fn-compose":3}],8:[function(require,module,exports){
+},{"../d3-helpers/access-prop":8,"../d3-helpers/stack-offset-center":9,"d3":3,"fn-compose":4,"range-inclusive":6}],11:[function(require,module,exports){
 var d3 = require('d3')
 var convention = require('d3-convention')
+var parallel = require('run-parallel')
 
 var genderDistributionGraphic = require('./graphics/gender-distribution')
 
 var genderDist = convention({
-  svg: window.document.getElementById('gender-distribution')
+  svg: window.document.getElementById('gender-distribution'),
+  width: 1260,
+  height: 720
 })
 
-var comMemGender = convention({
-  svg: window.document.getElementById('committee-member-gender')
-})
-
-var artLocation = convention({
-  svg: window.document.getElementById('art-location')
-})
-
-d3.csv('artists-purchases.csv')
-.row(function (d) {
-  return {
-    id: d.id,
-    gender: d.gender,
-    year: +d.year
-  }
-})
-.get(function (err, data) {
+parallel([
+  d3.csv('artists-purchases.csv')
+  .row(function (d) { return { id: d.id, gender: d.gender, year: +d.year } }).get,
+  d3.csv('committee-members.csv')
+  .row(function (d) { return { name: d.name, gender: d.gender, committee_id: +d.committee_id, position: d.position, start_date: new Date(d.start_date), end_date: new Date(d.end_date) } }).get
+], function (err, data) {
   if (err) return console.error(err)
+
+  data = {artistsPurchases: data[0], committeeMembers: data[1]}
 
   genderDistributionGraphic(genderDist, data)
 })
 
-},{"./graphics/gender-distribution":7,"d3":2,"d3-convention":1}]},{},[8]);
+},{"./graphics/gender-distribution":10,"d3":3,"d3-convention":2,"run-parallel":7}]},{},[11]);

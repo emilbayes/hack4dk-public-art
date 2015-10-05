@@ -1,3 +1,6 @@
+
+@import url(https://fonts.googleapis.com/css?family=Lora);
+
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
 
 /**
@@ -421,4 +424,47 @@ table {
 td,
 th {
   padding: 0;
+}
+
+main {
+  width: 1280px;
+  margin: auto;
+}
+
+p, h1 {
+  width: 640px;
+  width: 40rem;
+  margin: 1em auto;
+  display: block;
+  font-family: 'Lora', serif;
+}
+
+path.m {
+  fill: #4E96A3;
+}
+
+path.k {
+  fill: #FE664A;
+}
+
+line.new-committee {
+  stroke: #fff;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font: 10px sans-serif;
+  fill: #555;
+}
+
+.diff-line {
+  fill: none;
+  stroke: rgba(64,64,64,.6);
+  stroke-width: 1.5px;
 }
