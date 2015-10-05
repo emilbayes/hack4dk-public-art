@@ -6,7 +6,7 @@ var offsetCenter = require('../d3-helpers/stack-offset-center')
 
 module.exports = function (conv, data) {
   var yearScale = d3.scale.linear()
-      .domain(d3.extent(data, ƒ('year')))
+      .domain(d3.extent(data.artistsPurchases, ƒ('year')))
 			.range(conv.x.range())
 
   var countScale = d3.scale.linear()
@@ -32,10 +32,18 @@ module.exports = function (conv, data) {
   var genders = d3.nest()
       .key(ƒ('gender'))
       .rollup(bin)
-      .entries(data
+      .entries(data.artistsPurchases
 					.filter(ƒ('year'))
 					.filter(function (d) { return d.gender !== 'grp' })
 			)
+
+  // Roll up committees into the start of their servance
+  var committees = d3.nest()
+      .key(ƒ('committee_id'))
+      .rollup(function (values) {
+        return d3.min(values.map(ƒ('start_date')).map(function (d) { return d.getFullYear() }))
+      })
+      .entries(data.committeeMembers)
 
   conv.svg.selectAll('path')
 			.data(stack(genders))
