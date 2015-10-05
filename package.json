@@ -1,6 +1,6 @@
 {
   "name": "hack4dk-public-art",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Visualisation of public art in Denmark, bought by Kunst Styrelsen (the Art Agency)",
   "main": "src/index.js",
   "scripts": {
